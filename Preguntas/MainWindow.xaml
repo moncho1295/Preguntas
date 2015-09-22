@@ -1,0 +1,8 @@
+﻿<Window x:Class="Preguntas.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Preguntas" Height="350" Width="525">
+    <StackPanel Margin="10">
+        <StackPanel x:Name="MainStackPanel"/>
+    </StackPanel>
+</Window>
