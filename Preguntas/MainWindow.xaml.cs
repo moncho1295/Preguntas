@@ -46,7 +46,7 @@ namespace Preguntas
     {
         private string _linea;
         protected string[] _partes;
-        private string _textoPregunta;
+        protected string _textoPregunta;
 
         // Constructor
         public Pregunta(string linea)
@@ -69,11 +69,17 @@ namespace Preguntas
                 return new Pregunta(linea);
         }
 
-        internal UIElement RenderControl()
+        internal virtual UIElement RenderControl()
         {
             TextBlock tb = new TextBlock();
-            tb.Text = _linea;
+            tb.Text = "Error de sintaxis en la línea: " + _linea;
             return tb;
+        }
+
+        protected UIElement AdornarStackPanel(StackPanel sp)
+        {
+            sp.Margin = new Thickness(5);
+            return sp;
         }
     }
 
@@ -82,27 +88,94 @@ namespace Preguntas
     {
         private string _textoRespuesta;
         private TextBlock _tbRespuesta;
+        private bool _respuestaEsVisible = false;
         public TipoUnica(string linea) : base(linea)
         {
             _textoRespuesta = _partes[2];
+        }
+
+        // Sobrecarga de métodos (Hijo -> Padre)
+        internal override UIElement RenderControl()
+        {
+            StackPanel sp = new StackPanel();
+            TextBlock tbPregunta = new TextBlock();
+            tbPregunta.Text = _textoPregunta;
+            tbPregunta.Cursor = Cursors.Hand;
+            _tbRespuesta = new TextBlock();
+            _tbRespuesta.Text = _textoRespuesta;
+
+            // Agregando un nuevo manejador de eventos al clic de la pregunta
+            tbPregunta.MouseDown += new MouseButtonEventHandler(tbPregunta_MouseDown);
+
+            // Ocultando la respuesta
+            _tbRespuesta.Visibility = Visibility.Collapsed;
+
+            sp.Children.Add(tbPregunta);
+            sp.Children.Add(_tbRespuesta);
+
+            return AdornarStackPanel(sp);
+        }
+
+        void tbPregunta_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (_respuestaEsVisible)
+                _tbRespuesta.Visibility = Visibility.Collapsed;
+            else
+                _tbRespuesta.Visibility = Visibility.Visible;
+
+            _respuestaEsVisible = !_respuestaEsVisible;
         }
     }
 
     // Clase encargada de las preguntas de tipo múltiple
     public class RespuestasMultiples : Pregunta
     {
+        private string _textoRespuesta1;
+        private string _textoRespuesta2;
+        private string _textoRespuesta3;
+        private string _textoRespuesta4;
         public RespuestasMultiples(string linea) : base(linea)
         {
+            _textoRespuesta1 = _partes[2];
+            _textoRespuesta2 = _partes[3];
+            _textoRespuesta3 = _partes[4];
+            _textoRespuesta4 = _partes[5];
+        }
 
+        internal override UIElement RenderControl()
+        {
+            StackPanel sp = new StackPanel();
+            TextBlock tbPregunta = new TextBlock();
+            tbPregunta.Text = _textoPregunta;
+
+            TextBlock _tbRespuesta1 = new TextBlock();
+            _tbRespuesta1.Text = _textoRespuesta1;
+
+            TextBlock _tbRespuesta2 = new TextBlock();
+            _tbRespuesta2.Text = _textoRespuesta2;
+
+            TextBlock _tbRespuesta3 = new TextBlock();
+            _tbRespuesta3.Text = _textoRespuesta3;
+
+            TextBlock _tbRespuesta4 = new TextBlock();
+            _tbRespuesta4.Text = _textoRespuesta4;
+
+            sp.Children.Add(tbPregunta);
+            sp.Children.Add(_tbRespuesta1);
+            sp.Children.Add(_tbRespuesta2);
+            sp.Children.Add(_tbRespuesta3);
+            sp.Children.Add(_tbRespuesta4);
+
+            return AdornarStackPanel(sp);
         }
     }
 
     // Clase encargada de las preguntas de tipo verdadero / falso
-    public class VerdaderoFalso : Pregunta
+    public class VerdaderoFalso : TipoUnica
     {
         public VerdaderoFalso(string linea) : base(linea)
         {
-
+            _textoPregunta = "Verdadero o Falso: " + _textoPregunta;
         }
     }
 }
